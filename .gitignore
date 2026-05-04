@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local design notes (kept out of public history)
+DESIGN.MD
+DESIGN.md
+config/keys.yaml
+
