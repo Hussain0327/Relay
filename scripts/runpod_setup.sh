@@ -16,7 +16,11 @@ log()  { printf '[runpod_setup] %s\n' "$*"; }
 fail() { printf '[runpod_setup] ERROR: %s\n' "$*" >&2; exit 1; }
 
 # -------- 1. Required environment --------
-[[ -n "${HF_TOKEN:-}" ]] || fail "HF_TOKEN unset. Create a token at https://huggingface.co/settings/tokens and accept the Llama 3 license at https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct, then export HF_TOKEN=hf_xxx and re-run."
+# HF_TOKEN is optional. Required only for gated models (e.g. Llama 3); non-gated
+# models (gpt-oss, DeepSeek, Qwen, Mistral) download anonymously from the HF hub.
+if [[ -z "${HF_TOKEN:-}" ]]; then
+  log "HF_TOKEN unset; proceeding anonymously. For gated models, create a token at https://huggingface.co/settings/tokens and accept the model license on its HF page."
+fi
 
 # -------- 2. NVIDIA driver --------
 if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
@@ -75,7 +79,7 @@ else
     --ipc=host \
     -p "${HOST_PORT}:8001" \
     -v "${HF_CACHE_DIR}:/root/.cache/huggingface" \
-    -e "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
+    ${HF_TOKEN:+-e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN} \
     --restart unless-stopped \
     "$VLLM_IMAGE" \
     --model "$MODEL" \
