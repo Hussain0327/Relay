@@ -220,5 +220,6 @@ __marimo__/
 # Local design notes (kept out of public history)
 DESIGN.MD
 DESIGN.md
+NEXT.md
 config/keys.yaml
 
